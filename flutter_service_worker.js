@@ -3,36 +3,42 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 const RESOURCES = {
-  "assets/AssetManifest.json": "e9a6e96dce80eabed9096d8677569099",
-"assets/FontManifest.json": "5a32d4310a6f5d9a6b651e75ba0d7372",
-"assets/fonts/MaterialIcons-Regular.otf": "1288c9e28052e028aba623321f7826ac",
-"assets/lib/assets/images/launcher_Calc.png": "9a0b6976cbf2fde6aee26b1fcb3ded16",
-"assets/lib/assets/images/launcher_karne.png": "d0e764d0bac86c951e15f28b9e5ca393",
-"assets/lib/assets/images/launcher_quiz.png": "0cab5b569615262ec8027fcbfe93df26",
-"assets/lib/assets/images/myLogo.gif": "763aec3619efc95266b48ef7771a6861",
-"assets/lib/assets/images/myPhoto.png": "037f48be96131081669a7a8a8029eba0",
-"assets/NOTICES": "79ebbc639f24c9f9a0de69b4b986fee0",
-"assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "b14fcf3ee94e3ace300b192e9e7c8c5d",
-"assets/packages/font_awesome_flutter/lib/fonts/fa-brands-400.ttf": "831eb40a2d76095849ba4aecd4340f19",
-"assets/packages/font_awesome_flutter/lib/fonts/fa-regular-400.ttf": "a126c025bab9a1b4d8ac5534af76a208",
-"assets/packages/font_awesome_flutter/lib/fonts/fa-solid-900.ttf": "d80ca32233940ebadc5ae5372ccd67f9",
-"favicon.png": "29306d182b306be94352e66c8de46368",
+  "version.json": "bfe2a84e93e3e0065ea96351e645eecd",
+"index.html": "ce2c17c3016b55ca4983a62f8804d33a",
+"/": "ce2c17c3016b55ca4983a62f8804d33a",
+"main.dart.js": "bcf2f95f16d6d4b44645cbb0f209f896",
+"flutter.js": "1cfe996e845b3a8a33f57607e8b09ee4",
+"favicon.png": "767bdbaf9381de8b216535528bb32a7b",
 "icons/Icon-192.png": "ac9a721a12bbc803b44f645561ecb1e1",
+"icons/Icon-maskable-192.png": "c457ef57daa1d16f64b27b786ec2ea3c",
+"icons/Icon-maskable-512.png": "301a7604d45b3e739efc881eb04896ea",
 "icons/Icon-512.png": "96e752610906ba2a93c65f8abe1645f1",
-"index.html": "953567277fa50df07afedf974150a8fd",
-"/": "953567277fa50df07afedf974150a8fd",
-"main.dart.js": "49c296db55898dd514ebf2cf65d31ce4",
-"manifest.json": "f8e0e9b3fcd99e41e00f9e30800558b8",
-"version.json": "f4d90970fb9d8e9f8d9836379b9de93f"
+"manifest.json": "49f58504b2b75018a162d7478e869b01",
+"assets/AssetManifest.json": "3a6ee6d9f24a3d9d4ea7dd6693a7eed8",
+"assets/NOTICES": "9c5b5b2671fe3f6f7c2be0961fcf3cc0",
+"assets/FontManifest.json": "dc3d03800ccca4601324923c0b1d6d57",
+"assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "6d342eb68f170c97609e9da345464e5e",
+"assets/fonts/MaterialIcons-Regular.otf": "e7069dfd19b331be16bed984668fe080",
+"assets/assets/icons/Search.svg": "7729be8310241910a920294bfa8e9cf1",
+"assets/assets/icons/logo_rebab.png": "2202443ac583002f2a5f9e23fa3eaa62",
+"assets/assets/icons/logo-office.png": "cf7c4ee8bac1e8f672e0d3b7f133a92e",
+"assets/assets/icons/Scan.svg": "69096da4943929b8c53d12429a828741",
+"assets/assets/icons/logo.png": "f93d97a509495539434fce3a167a9bd3",
+"assets/assets/icons/logo_bold.png": "28cb4f8062897bfb4a11009a37607161",
+"assets/assets/icons/logo_bold.svg": "91162d64f2019dad4082283632cc1116",
+"assets/assets/icons/logo.jpeg": "55c9a9fed6819e6e232490252d31cb19",
+"assets/assets/icons/logo.svg": "db1ff3143236c618beef874e2bfa9652",
+"canvaskit/canvaskit.js": "97937cb4c2c2073c968525a3e08c86a3",
+"canvaskit/profiling/canvaskit.js": "c21852696bc1cc82e8894d851c01921a",
+"canvaskit/profiling/canvaskit.wasm": "371bc4e204443b0d5e774d64a046eb99",
+"canvaskit/canvaskit.wasm": "3de12d898ec208a5f31362cc00f09b9e"
 };
 
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = [
-  "/",
-"main.dart.js",
+  "main.dart.js",
 "index.html",
-"assets/NOTICES",
 "assets/AssetManifest.json",
 "assets/FontManifest.json"];
 // During install, the TEMP cache is populated with the application shell files.
@@ -41,7 +47,7 @@ self.addEventListener("install", (event) => {
   return event.waitUntil(
     caches.open(TEMP).then((cache) => {
       return cache.addAll(
-        CORE.map((value) => new Request(value + '?revision=' + RESOURCES[value], {'cache': 'reload'})));
+        CORE.map((value) => new Request(value, {'cache': 'reload'})));
     })
   );
 });
@@ -131,9 +137,11 @@ self.addEventListener("fetch", (event) => {
     .then((cache) =>  {
       return cache.match(event.request).then((response) => {
         // Either respond with the cached resource, or perform a fetch and
-        // lazily populate the cache.
+        // lazily populate the cache only if the resource was successfully fetched.
         return response || fetch(event.request).then((response) => {
-          cache.put(event.request, response.clone());
+          if (response && Boolean(response.ok)) {
+            cache.put(event.request, response.clone());
+          }
           return response;
         });
       })
@@ -167,7 +175,7 @@ async function downloadOffline() {
     }
     currentContent[key] = true;
   }
-  for (var resourceKey in Object.keys(RESOURCES)) {
+  for (var resourceKey of Object.keys(RESOURCES)) {
     if (!currentContent[resourceKey]) {
       resources.push(resourceKey);
     }
